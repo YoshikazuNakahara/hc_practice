@@ -6,6 +6,8 @@ body {
 
 .container {
   margin: 0 auto;
+  max-width: 960px;
+  padding: 0 4%;
   text-align: center;
 }
 
@@ -15,7 +17,7 @@ header {
 }
 
 .header-content {
-  width: 960px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }
@@ -39,13 +41,14 @@ header {
 }
 
 .self-intro {
-  width: 960px;
+  width: 100%;
 }
 
 .intro-item {
-display: flex;
-justify-content: center;
-gap: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .intro-item img {
@@ -54,15 +57,23 @@ gap: 16px;
 
 .image-grid {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
-
 .image-item img {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
 }
 
 footer {
   font-weight: lighter;
+}
+
+@media (max-width: 600px) {
+  .intro-item, .image-grid {
+    flex-direction: column;
+    align-items: center;
+  }
 }
