@@ -4,7 +4,7 @@ body {
   color: #333;
 }
 
-.container {
+.base-element {
   margin: 0 auto;
   max-width: 960px;
   padding: 0 4%;
@@ -33,6 +33,12 @@ header {
   text-wrap: nowrap;
   list-style: none;
   gap: 20%;
+}
+
+.main-visual {
+  overflow: visible;
+  display: flex;
+  justify-content: center;
 }
 
 .main-visual img {
@@ -72,8 +78,20 @@ footer {
 }
 
 @media (max-width: 600px) {
+  .left-header-content {
+    padding-left: 0;
+  }
+
+  .main-visual img {
+    width: auto;
+  }
+
   .intro-item, .image-grid {
     flex-direction: column;
     align-items: center;
+  }
+
+  footer {
+    text-align: center;
   }
 }
