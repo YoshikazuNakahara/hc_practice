@@ -5,6 +5,17 @@
 標準的なゴルフ用語を使用してプレイヤーのパフォーマンスを判定します。
 """
 
+# 定数定義
+SCORE_MAP = {
+    0: "パー",
+    1: "ボギー",
+    2: "2ボギー",
+    3: "3ボギー",
+    -1: "バーディ",
+    -2: "イーグル",
+    -3: "アルバトロス"
+}
+
 def calculate_golf_score(par, strokes):
     """
     パーとストローク数に基づいてゴルフスコアを計算します。
@@ -36,26 +47,15 @@ def calculate_golf_score(par, strokes):
     # パーとストローク数の差を計算
     diff = strokes - par
     
-    # スコアマッピング
-    score_map = {
-        0: "パー",
-        1: "ボギー",
-        2: "2ボギー",
-        3: "3ボギー",
-        -1: "バーディ",
-        -2: "イーグル",
-        -3: "アルバトロス"
-    }
-    
     # 複数ボギーの処理
     if diff > 3:
         return f"{diff}ボギー"
     
     # スコアマップから結果を返す（該当しない場合はエラー）
-    if diff not in score_map:
+    if diff not in SCORE_MAP:
         raise ValueError(f"不正なスコア: パー {par}, ストローク数 {strokes}")
     
-    return score_map[diff]
+    return SCORE_MAP[diff]
 
 def main():
     """
