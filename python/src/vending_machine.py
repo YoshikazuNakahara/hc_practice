@@ -4,21 +4,38 @@
 このモジュールは、Suicaと自動販売機の基本的な機能を実装します。
 """
 from src.suica import Suica
-from src.juice import Juice
 
 class VendingMachine:
     """
-    自動販売機を表すクラス
+    自動販売機を表すクラス。
+
+    このクラスは、ドリンクの購入、在庫管理、売上の追跡を行います。
+    ドリンクの価格は固定されており、在庫は初期化時に設定されます。
+
+    Attributes:
+        __sales (int): 現在の売上金額。
+        __stock (dict): 各ドリンクの在庫数を保持する辞書。
     """
+    
+    # ドリンク価格表
+    __DRINK_PRICES = {
+        "ペプシ": 150,
+        "モンスター": 230,
+        "いろはす": 120
+    }
+    
     def __init__(self):
         """
         自動販売機を初期化します。
+        売上金額と在庫を設定します。
         """
+        # 売上金額
         self.__sales = 0
-        self.__drinks = {
-            "ペプシ": [Juice("ペプシ", 150) for _ in range(5)],
-            "モンスター": [Juice("モンスター", 230) for _ in range(5)],
-            "いろはす": [Juice("いろはす", 120) for _ in range(5)]
+        # 在庫
+        self.__stock = {
+            "ペプシ": 5,
+            "モンスター": 5,
+            "いろはす": 5
         }
     
     def get_sales(self):
@@ -40,7 +57,7 @@ class VendingMachine:
         Returns:
             int: 在庫数
         """
-        return len(self.__drinks.get(drink_name, []))
+        return self.__stock.get(drink_name, 0)
     
     def get_available_drinks(self):
         """
@@ -50,8 +67,8 @@ class VendingMachine:
             list: 購入可能なドリンクのリスト
         """
         return [
-            name for name, drinks in self.__drinks.items() 
-            if len(drinks) > 0
+            name for name, count in self.__stock.items() 
+            if count > 0
         ]
     
     def can_purchase(self, drink_name, suica):
@@ -65,13 +82,13 @@ class VendingMachine:
         Returns:
             bool: 購入可能な場合はTrue、そうでない場合はFalse
         """
-        if drink_name not in self.__drinks:
+        if drink_name not in self.__DRINK_PRICES.keys():
             return False
         
-        if len(self.__drinks[drink_name]) == 0:
+        if self.__stock[drink_name] <= 0: 
             return False
         
-        drink_price = self.__drinks[drink_name][0].get_price()
+        drink_price = self.__DRINK_PRICES[drink_name]
         return suica.get_charge() >= drink_price
     
     def purchase(self, drink_name, suica):
@@ -89,7 +106,7 @@ class VendingMachine:
             raise ValueError("購入できません。")
         
         # ドリンクの価格を取得
-        drink_price = self.__drinks[drink_name][0].get_price()
+        drink_price = self.__DRINK_PRICES[drink_name]
         
         # Suicaから支払い
         suica.pay(drink_price)
@@ -98,7 +115,7 @@ class VendingMachine:
         self.__sales += drink_price
         
         # 在庫を減らす
-        self.__drinks[drink_name].pop()
+        self.__stock[drink_name] -= 1
     
     def add_stock(self, drink_name, count):
         """
@@ -111,14 +128,10 @@ class VendingMachine:
         Raises:
             ValueError: 存在しないドリンクの場合
         """
-        if drink_name not in self.__drinks:
+        if drink_name not in self.__DRINK_PRICES:
             raise ValueError(f"{drink_name}は販売していません。")
         
-        for _ in range(count):
-            self.__drinks[drink_name].append(
-                Juice(drink_name, 
-                      next(iter(self.__drinks[drink_name])).get_price())
-            )
+        self.__stock[drink_name] += count
 
 def main():
     """
