@@ -4,6 +4,7 @@
 このモジュールは、Suicaと自動販売機の基本的な機能を実装します。
 """
 from src.suica import Suica
+from src.juice import Juice  # Juiceクラスをインポート
 
 class VendingMachine:
     """
@@ -14,7 +15,7 @@ class VendingMachine:
 
     Attributes:
         __sales (int): 現在の売上金額。
-        __stock (dict): 各ドリンクの在庫数を保持する辞書。
+        __stock (list): 各ドリンクのJuiceオブジェクトを保持するリスト。
     """
     
     # ドリンク価格表
@@ -31,12 +32,14 @@ class VendingMachine:
         """
         # 売上金額
         self.__sales = 0
-        # 在庫
-        self.__stock = {
-            "ペプシ": 5,
-            "モンスター": 5,
-            "いろはす": 5
-        }
+        # 在庫をJuiceオブジェクトのリストとして初期化
+        self.__stock = [
+            Juice("ペプシ", self.__DRINK_PRICES["ペプシ"]) for _ in range(5)
+        ] + [
+            Juice("モンスター", self.__DRINK_PRICES["モンスター"]) for _ in range(5)
+        ] + [
+            Juice("いろはす", self.__DRINK_PRICES["いろはす"]) for _ in range(5)
+        ]
     
     def get_sales(self):
         """
@@ -57,7 +60,8 @@ class VendingMachine:
         Returns:
             int: 在庫数
         """
-        return self.__stock.get(drink_name, 0)
+        # 指定されたドリンクの在庫数を取得
+        return sum(1 for juice in self.__stock if juice.get_name() == drink_name)
     
     def get_available_drinks(self):
         """
@@ -66,10 +70,8 @@ class VendingMachine:
         Returns:
             list: 購入可能なドリンクのリスト
         """
-        return [
-            name for name, count in self.__stock.items() 
-            if count > 0
-        ]
+        # ユニークなドリンク名を取得
+        return list(set(juice.get_name() for juice in self.__stock))
     
     def can_purchase(self, drink_name, suica):
         """
@@ -82,10 +84,8 @@ class VendingMachine:
         Returns:
             bool: 購入可能な場合はTrue、そうでない場合はFalse
         """
-        if drink_name not in self.__DRINK_PRICES.keys():
-            return False
-        
-        if self.__stock[drink_name] <= 0: 
+        # 指定されたドリンクが在庫に存在するか確認
+        if self.get_stock(drink_name) == 0:
             return False
         
         drink_price = self.__DRINK_PRICES[drink_name]
@@ -114,8 +114,12 @@ class VendingMachine:
         # 売上を増やす
         self.__sales += drink_price
         
-        # 在庫を減らす
-        self.__stock[drink_name] -= 1
+        # 在庫からドリンクを削除
+        for i, juice in enumerate(self.__stock):
+            if juice.get_name() == drink_name:
+                
+                del self.__stock[i]
+                break
     
     def add_stock(self, drink_name, count):
         """
@@ -131,7 +135,9 @@ class VendingMachine:
         if drink_name not in self.__DRINK_PRICES:
             raise ValueError(f"{drink_name}は販売していません。")
         
-        self.__stock[drink_name] += count
+        self.__stock.extend(
+            Juice(drink_name, self.__DRINK_PRICES[drink_name]) for _ in range(count)
+        )
 
 def main():
     """

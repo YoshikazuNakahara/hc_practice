@@ -73,6 +73,37 @@ def test_add_stock():
     machine.add_stock("ペプシ", 3)
     assert machine.get_stock("ペプシ") == 8  # 在庫が8本になる
 
+def test_get_available_drinks_initial():
+    """初期状態の購入可能なドリンクのリストが正しいことを確認"""
+    machine = VendingMachine()
+    
+    available_drinks = machine.get_available_drinks()
+    assert sorted(available_drinks) == sorted(["いろはす", "ペプシ", "モンスター"])  # 名前順の確認
+
+def test_get_available_drinks_after_purchase():
+    """ペプシ購入後の購入可能なドリンクのリストが正しいことを確認"""
+    suica = Suica()  # 初期チャージ500円
+    machine = VendingMachine()
+    
+    machine.purchase("ペプシ", suica)
+    
+    available_drinks_after_purchase = machine.get_available_drinks()
+    assert "ペプシ" in available_drinks_after_purchase  # ペプシが購入可能なドリンクに残っていることを確認
+    assert sorted(available_drinks_after_purchase) == sorted(["いろはす", "ペプシ", "モンスター"])  # 期待されるドリンクの確認
+
+def test_get_available_drinks_out_of_stock():
+    """ペプシの在庫がなくなった後の購入可能なドリンクのリストが正しいことを確認"""
+    suica = Suica(1000)  # 初期チャージ1000円
+    machine = VendingMachine()
+    
+    # ペプシの在庫をなくすまで購入
+    while machine.can_purchase("ペプシ", suica):
+        machine.purchase("ペプシ", suica)
+
+    available_drinks_after_purchase = machine.get_available_drinks()
+    assert "ペプシ" not in available_drinks_after_purchase  # ペプシが購入可能なドリンクに残っていないことを確認
+    assert sorted(available_drinks_after_purchase) == sorted(["いろはす", "モンスター"])  # 期待されるドリンクの確認
+
 def test_juice_initialization():
     """ジュースの初期化が正しく行われることを確認"""
     juice = Juice("ペプシ", 150)
