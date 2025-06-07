@@ -1,82 +1,92 @@
 ```mermaid
 erDiagram
-    user {
-        BIGINT user_id PK
+    users {
+        BIGINT id PK
         VARCHAR(255) email UK
         VARCHAR(20) tel UK
-        VARCHAR(100) displayName
+        VARCHAR(100) display_name
         TEXT profile
         VARCHAR(255) url
         DATE birthday
         VARCHAR(255) profile_image
         VARCHAR(255) avotor_image
-        VARCHAR(50) userName UK
+        VARCHAR(50) user_name UK
+        DATETIME created_at
+        DATETIME updated_at
     }
 
-    tweet {
-        BIGINT tweet_id PK
+    tweets {
+        BIGINT id PK
         BIGINT user_id FK
         VARCHAR(140) contents
-        DATETIME created_at
-        DATETIME update_at
         VARCHAR(100) place
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     follows {
-        BIGINT follower_user_id FK,PK
-        BIGINT followee_user_id FK,PK
+        BIGINT id PK
+        BIGINT follower_user_id FK
+        BIGINT followee_user_id FK
         DATETIME created_at
+        DATETIME updated_at
     }
 
     likes {
-        BIGINT user_id FK,PK
-        BIGINT tweet_id FK,PK
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT tweet_id FK
         DATETIME created_at
+        DATETIME updated_at
     }
 
-    notification {
-        BIGINT notification_id PK
-        VARCHAR(50) kind "follow, like, dm, retweet"
+    notifications {
+        BIGINT id PK
+        VARCHAR(50) kind
         BIGINT target_id
         DATETIME created_at
+        DATETIME updated_at
         BOOLEAN is_read
     }
 
-    dm {
-        BIGINT dm_id PK
-        BIGINT sendor_id FK
-        BIGINT reciever_id FK
+    direct_messages {
+        BIGINT id PK
+        BIGINT sender_id FK
+        BIGINT receiver_id FK
         TEXT contents
         DATETIME created_at
         DATETIME updated_at
     }
 
     bookmarks {
-        BIGINT user_id FK,PK
-        BIGINT tweet_id FK,PK
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT tweet_id FK
         DATETIME created_at
+        DATETIME updated_at
     }
 
     retweets {
-        BIGINT user_id FK,PK
-        BIGINT tweet_id FK,PK
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT tweet_id FK
         DATETIME created_at
+        DATETIME updated_at
     }
 
-    user ||--o{ tweet : "has"
-    user ||--o{ follows : "follows"
-    user ||--o{ likes : "likes"
-    user ||--o{ notification : "receives"
-    user ||--o{ dm : "sends/receives"
-    user ||--o{ bookmarks : "bookmarks"
-    user ||--o{ retweets : "retweets"
+    users ||--o{ tweets : "posts"
+    users ||--o{ follows : "initiates"
+    users ||--o{ likes : "performs"
+    users ||--o{ notifications : "receives"
+    users ||--o{ direct_messages : "sends/receives"
+    users ||--o{ bookmarks : "marks"
+    users ||--o{ retweets : "performs"
 
-    tweet ||--o{ likes : "is_liked_by"
-    tweet ||--o{ bookmarks : "is_bookmarked_by"
-    tweet ||--o{ retweets : "is_retweeted_by"
+    tweets ||--o{ likes : "is liked by"
+    tweets ||--o{ bookmarks : "is bookmarked by"
+    tweets ||--o{ retweets : "is retweeted by"
 
-    tweet ||--o{ dm : "may_reference"
-    notification }o--|| tweet : "notifies_about"
-    notification }o--|| user : "notifies_about"
-    notification }o--|| dm : "notifies_about"
+    notifications }o--|| tweets : "about"
+    notifications }o--|| users : "about"
+    notifications }o--|| direct_messages : "about"
 ```
