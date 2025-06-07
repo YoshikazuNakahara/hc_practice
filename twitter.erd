@@ -1,0 +1,100 @@
+[users]
+*id {label:PK}
+email {label:VARCHAR(255),UK}
+tel {label:VARCHAR(20),UK}
+display_name {label:VARCHAR(100)}
+profile {label:TEXT}
+url {label:VARCHAR(255)}
+birthday {label:DATE}
+profile_image {label:VARCHAR(255)}
+avotor_image {label:VARCHAR(255)}
+user_name {label:VARCHAR(50),UK}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[tweets]
+*id {label:PK}
+user_id {label:BIGINT,FK(users.id)}
+contents {label:VARCHAR(140)}
+place {label:VARCHAR(100)}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[follows]
+*id {label:PK}
+follower_user_id {label:BIGINT,FK(users.id)}
+followee_user_id {label:BIGINT,FK(users.id)}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[likes]
+*id {label:PK}
+user_id {label:BIGINT,FK(users.id)}
+tweet_id {label:BIGINT,FK(tweets.id)}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[notifications]
+*id {label:PK}
+kind {label:VARCHAR(50)}
+target_id {label:BIGINT}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+is_read {label:BOOLEAN}
+
+[direct_messages]
+*id {label:PK}
+sender_id {label:BIGINT,FK(users.id)}
+receiver_id {label:BIGINT,FK(users.id)}
+contents {label:TEXT}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[bookmarks]
+*id {label:PK}
+user_id {label:BIGINT,FK(users.id)}
+tweet_id {label:BIGINT,FK(tweets.id)}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+[retweets]
+*id {label:PK}
+user_id {label:BIGINT,FK(users.id)}
+tweet_id {label:BIGINT,FK(tweets.id)}
+created_at {label:DATETIME}
+updated_at {label:DATETIME}
+
+# users と tweets
+users --o{ tweets : "posts"
+
+# users と follows
+users --o{ follows : "initiates"
+
+# users と likes
+users --o{ likes : "performs"
+
+# users と notifications
+users --o{ notifications : "receives"
+
+# users と direct_messages
+users --o{ direct_messages : "sends/receives"
+
+# users と bookmarks
+users --o{ bookmarks : "marks"
+
+# users と retweets
+users --o{ retweets : "performs"
+
+# tweets と likes
+tweets --o{ likes : "is liked by"
+
+# tweets と bookmarks
+tweets --o{ bookmarks : "is bookmarked by"
+
+# tweets と retweets
+tweets --o{ retweets : "is retweeted by"
+
+# notifications relationship
+# notifications --o{ tweets : "about tweet"
+# notifications --o{ users : "about user"
+# notifications --o{ direct_messages : "about dm"
