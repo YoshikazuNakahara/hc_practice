@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     user {
         BIGINT user_id PK
@@ -78,3 +79,4 @@ erDiagram
     notification }o--|| tweet : "notifies_about"
     notification }o--|| user : "notifies_about"
     notification }o--|| dm : "notifies_about"
+```
